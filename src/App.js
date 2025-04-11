@@ -12,7 +12,6 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [unit, setUnit] = useState('metric'); // Celsius by default
 
   const apiKey = 'yLhLRbuOn55ycWWyeEAA0GzTkmFWTyk9'; // Should be in .env
 
@@ -61,7 +60,7 @@ function App() {
       if (!location) throw new Error('Location not found');
 
       const forecastResponse = await axios.get(
-        `http://dataservice.accuweather.com/forecasts/v1/daily/1day/${location.Key}?apikey=${apiKey}&metric=${unit === 'metric'}`
+        `http://dataservice.accuweather.com/forecasts/v1/daily/1day/${location.Key}?apikey=${apiKey}&metric=true`
       );
       
       const forecast = forecastResponse.data.DailyForecasts[0];
@@ -75,7 +74,7 @@ function App() {
         date: forecast.Date,
         minTemp: forecast.Temperature.Minimum.Value,
         precipitation: forecast.Day.HasPrecipitation ? 'Yes' : 'No',
-        unit: unit === 'metric' ? '°C' : '°F'
+        unit: '°C' // Hardcode to Celsius
       });
     } catch (err) {
       setError(err.message || 'Error fetching weather data');
@@ -101,13 +100,6 @@ function App() {
       'windy': '💨'
     };
     return icons[weatherText.toLowerCase()] || '🌡️';
-  };
-
-  const toggleUnit = () => {
-    setUnit(unit === 'metric' ? 'imperial' : 'metric');
-    if (weatherData) {
-      fetchWeatherByCity({ preventDefault: () => {} }); // Refetch with new unit
-    }
   };
 
   return (
@@ -201,23 +193,6 @@ function App() {
                 <span>{weatherData.precipitation}</span>
               </div>
             </div>
-
-            <button
-              className="unit-toggle"
-              onClick={toggleUnit}
-              style={{
-                marginTop: '1rem',
-                background: 'transparent',
-                border: '2px solid var(--accent-color)',
-                padding: '0.5rem 1rem',
-                color: 'var(--accent-color)',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                width: '100%'
-              }}
-            >
-              Switch to {unit === 'metric' ? '°F' : '°C'}
-            </button>
           </div>
         )}
       </div>
